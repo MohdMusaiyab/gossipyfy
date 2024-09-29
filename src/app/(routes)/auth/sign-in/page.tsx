@@ -22,7 +22,7 @@ const SignInPage = () => {
       setError('Invalid credentials. Please try again.');
     } else {
       // Redirect to the home page or any other page after successful sign-in
-      router.push('/');
+      router.push('/explore');
     }
   };
 

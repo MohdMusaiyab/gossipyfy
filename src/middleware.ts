@@ -6,7 +6,7 @@ export async function middleware(req:NextRequest) {
     const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
   
     // Define protected routes
-    const protectedRoutes = ['/home', '/dashboard'];
+    const protectedRoutes = ['/home', '/dashboard', '/explore','/profile'];
   
     // Check if the user is accessing a protected route
     if (protectedRoutes.some(route => req.nextUrl.pathname.startsWith(route))) {
@@ -23,5 +23,6 @@ export async function middleware(req:NextRequest) {
   // Specify which paths the middleware should run on
   export const config = {
     //Check the paths which will be further added
-    matcher: ['/:path*', '/dashboard/:path*'], // add more paths as needed
+    matcher: ['/:path*', '/dashboard/:path*','/explore/:path*','/profile',
+    '/profile/:path*'], // add more paths as needed
   };

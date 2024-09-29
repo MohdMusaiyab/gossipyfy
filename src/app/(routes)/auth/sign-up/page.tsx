@@ -1,6 +1,6 @@
 // src/app/auth/signup/page.tsx
 "use client";
-
+import {router} from 'next/client';
 import { useState } from "react";
 export default function SignUpPage() {
   const [email, setEmail] = useState("");
@@ -30,6 +30,7 @@ export default function SignUpPage() {
       if (response.ok) {
         setSuccess("Sign up successful! Please log in.");
         // Redirect to the login page
+        router.push("/auth/sign-in");
 
       } else {
         const data = await response.json();
