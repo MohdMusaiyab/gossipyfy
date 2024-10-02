@@ -34,6 +34,7 @@ export async function POST(req: NextRequest) {
 
     const title = data.get('title') as string;
     const description = data.get('description') as string;
+    //Need to fix Language and Category
     const language = data.get('language') as string;
     const category = data.get('category') as string;
     const file = data.get('file');
@@ -70,7 +71,7 @@ export async function POST(req: NextRequest) {
         language,
         category,
         fileUrl: uniqueFileName,
-        userId: parseInt(id),
+        userId: id,
       },
     });
 

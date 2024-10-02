@@ -30,7 +30,7 @@ enum Category {
 }
 
 model User {
-  id         Int         @id @default(autoincrement())
+  id         String      @id @default(uuid())
   email      String      @unique
   username   String      @unique
   password   String
@@ -42,14 +42,15 @@ model User {
 }
 
 model VoiceNote {
-  id          Int      @id @default(autoincrement())
+  id          String      @id @default(uuid())
   title       String 
   fileUrl     String 
   description String? 
+  isPremium   Boolean  @default(false)
   language    Language 
   category    Category 
   createdAt   DateTime @default(now())
-  userId      Int
+  userId      String
   user        User      @relation(fields: [userId], references: [id])
 
   // Relations
@@ -63,21 +64,21 @@ model Comment {
   createdAt   DateTime  @default(now()) // Timestamp for when the comment was made
 
   // Foreign key references
-  userId      Int
+  userId      String
   user        User      @relation(fields: [userId], references: [id])
   
-  voiceNoteId Int
+  voiceNoteId String
   voiceNote   VoiceNote @relation(fields: [voiceNoteId], references: [id])
 }
 
 model Like {
-  id          Int       @id @default(autoincrement())
+  id          String       @id @default(uuid())
   createdAt   DateTime  @default(now()) // Timestamp for when the like was made
 
   // Foreign key references
-  userId      Int
+  userId      String
   user        User      @relation(fields: [userId], references: [id])
   
-  voiceNoteId Int
+  voiceNoteId String
   voiceNote   VoiceNote @relation(fields: [voiceNoteId], references: [id])
 }
