@@ -4,8 +4,7 @@ const page = () => {
   return (
     <div>
       Profile Page it is
-      Need to show the basic details of the user and option for uploading the noite
-      
+      Need to show the basic details of the user and option for uploading the notes
     </div>
   )
 }

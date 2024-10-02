@@ -49,7 +49,6 @@ model VoiceNote {
   language    Language 
   category    Category 
   createdAt   DateTime @default(now())
-  
   userId      Int
   user        User      @relation(fields: [userId], references: [id])
 

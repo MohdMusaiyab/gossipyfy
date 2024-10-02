@@ -1,11 +1,12 @@
-import React from 'react'
-
+import React from "react";
+import VoiceNoteCard from "../../components/VoiceNoteCard";
+import SideBar from "../../components/SideBar";
 const page = () => {
   return (
     <div>
-      All the Availbe Ones will come here
+      <SideBar />
     </div>
-  )
-}
+  );
+};
 
-export default page
+export default page;

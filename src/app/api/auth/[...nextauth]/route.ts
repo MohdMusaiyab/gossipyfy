@@ -46,8 +46,7 @@ export const authOptions: NextAuthOptions = {
           if (!isValidPassword) {
             throw new Error("Invalid password.");
           }
-          return user; // Return the user if the password is correct
-          
+          return user; 
         } catch (error) {
           console.error("Error during authorization:", error);
           return null; // Handle errors during the fetch
@@ -58,15 +57,21 @@ export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
     async session({ session, token }) {
+      
       if (token?.sub) {
         //@ts-ignore
         session.user.id = token.sub; // Assign user id from token to session
+        session.user.username = token.username;
+        session.user.isPremium= token.isPremium;
       }
       return session;
     },
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id; // Add user id to token if user exists
+        token.username = user?.username;
+        token.isPremium= user?.isPremium;
+
       }
       return token;
     },

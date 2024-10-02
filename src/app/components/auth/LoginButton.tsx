@@ -22,11 +22,28 @@ export default function LoginBtn() {
   };
 
   return (
-    <button
-      onClick={session ? handleLogout : handleLogin}
-      className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-    >
-      {session ? "Logout" : "Login"}
-    </button>
+    <div className="flex items-center space-x-4">
+      {session ? (
+        <>
+          {/* Display the username */}
+          <span className="text-white">
+            {session.user?.username || session.user?.email} {/* Fallback to email if username is not available */}
+          </span>
+          <button
+            onClick={handleLogout}
+            className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+          >
+            Logout
+          </button>
+        </>
+      ) : (
+        <button
+          onClick={handleLogin}
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        >
+          Login
+        </button>
+      )}
+    </div>
   );
 }
