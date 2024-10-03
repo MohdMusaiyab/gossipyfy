@@ -16,6 +16,7 @@
     "@types/uuid": "^10.0.0",
     "axios": "^1.7.7",
     "bcryptjs": "^2.4.3",
+    "date-fns": "^4.1.0",
     "formidable": "^3.5.1",
     "framer-motion": "^11.9.0",
     "jsonwebtoken": "^9.0.2",

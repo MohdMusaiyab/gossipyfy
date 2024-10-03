@@ -1,28 +1,29 @@
-"use client"
-import React, { useState } from 'react';
-import { signIn } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+"use client";
+import React, { useState } from "react";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const SignInPage = () => {
   const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    const result = await signIn('credentials', {
+
+    const result = await signIn("credentials", {
       redirect: false,
       email,
       password,
     });
 
     if (result?.error) {
-      setError('Invalid credentials. Please try again.');
+      setError("Invalid credentials. Please try again.");
     } else {
       // Redirect to the home page or any other page after successful sign-in
-      router.push('/explore');
+      router.push("/explore");
     }
   };
 
@@ -30,7 +31,7 @@ const SignInPage = () => {
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
       <div className="w-full max-w-md bg-white p-6 rounded shadow-lg">
         <h1 className="text-3xl font-bold text-center mb-6">Sign In</h1>
-        
+
         {error && <div className="text-red-500 mb-4">{error}</div>}
 
         <form onSubmit={handleSignIn}>
@@ -79,11 +80,14 @@ const SignInPage = () => {
         </div>
 
         <button
-          onClick={() => signIn('google', { callbackUrl: '/' })}
+          onClick={() => signIn("google", { callbackUrl: "/" })}
           className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
         >
           Sign in with Google
         </button>
+        <p className="text-blue-600">
+          Don't Have an Account?<Link href="/auth/sign-up">Sign Up</Link>
+        </p>
       </div>
     </div>
   );

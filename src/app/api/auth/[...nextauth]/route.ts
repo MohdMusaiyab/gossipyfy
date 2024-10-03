@@ -75,6 +75,8 @@ export const authOptions: NextAuthOptions = {
       }
       return token;
     },
+    //For Google Auth Add in Future
+    
   },
   pages: {
     signIn: "/auth/sign-in",

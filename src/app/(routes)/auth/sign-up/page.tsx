@@ -1,6 +1,6 @@
 // src/app/auth/signup/page.tsx
 "use client";
-import {router} from 'next/client';
+import {useRouter} from 'next/navigation';
 import { useState } from "react";
 export default function SignUpPage() {
   const [email, setEmail] = useState("");
@@ -8,6 +8,7 @@ export default function SignUpPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,10 +27,10 @@ export default function SignUpPage() {
           password,
         }),
       });
-
       if (response.ok) {
         setSuccess("Sign up successful! Please log in.");
         // Redirect to the login page
+        setError("");
         router.push("/auth/sign-in");
 
       } else {

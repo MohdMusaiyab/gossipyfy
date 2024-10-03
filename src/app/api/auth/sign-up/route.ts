@@ -46,6 +46,5 @@ export async function POST(request: Request) {
       isPremium: false, // Default value
     },
   });
-
-  return NextResponse.json(newUser, { status: 201 });
+  return NextResponse.json({ message: "User created.", success: true });
 }
