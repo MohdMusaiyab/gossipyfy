@@ -1,6 +1,8 @@
 "use client"; // This is a client-side component
 
 import { signIn, signOut, useSession } from "next-auth/react";
+import Link from 'next/link'
+
 
 export default function LoginBtn() {
   const { data: session } = useSession();
@@ -26,9 +28,9 @@ export default function LoginBtn() {
       {session ? (
         <>
           {/* Display the username */}
-          <span className="text-white">
+          <Link href="/profile" className="text-white">
             {session.user?.username || session.user?.email} {/* Fallback to email if username is not available */}
-          </span>
+          </Link>
           <button
             onClick={handleLogout}
             className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"

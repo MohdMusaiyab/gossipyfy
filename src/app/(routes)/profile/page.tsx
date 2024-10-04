@@ -1,12 +1,32 @@
-import React from 'react'
+import { getUser } from "@/actions/user/getUser";
+import UpdateUsernameForm from "../../components/profile/UpdateUsernameForm";
+import UpdateUserEmailForm from "../../components/profile/UpdateUserEmailForm";
+import UpdateUserPasswordForm from "../../components/profile/UpdateUserPasswordForm";
+const ProfilePage = async () => {
+  const user = await getUser(); // Fetch the user data
 
-const page = () => {
+  if (!user) {
+    return <div>No user data found</div>; // Handle case where user is not found
+  }
+
   return (
-    <div>
-      Profile Page it is
-      Need to show the basic details of the user and option for uploading the notes
-    </div>
-  )
-}
+    <div className="container mx-auto mt-10">
+      <h1 className="text-2xl font-bold">Profile Page</h1>
 
-export default page
+      {/* Display user's basic information */}
+      <p className="mt-4">
+        <strong>Username:</strong> {user.username}
+      </p>
+      <p>
+        <strong>Email:</strong> {user.email}
+      </p>
+
+      {/* Render the UpdateUsernameForm and pass the current username */}
+      <UpdateUsernameForm currentUsername={user.username} />
+      <UpdateUserEmailForm currentEmail={user.email} />
+      <UpdateUserPasswordForm />
+    </div>
+  );
+};
+
+export default ProfilePage;
