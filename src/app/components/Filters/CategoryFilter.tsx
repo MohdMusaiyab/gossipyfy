@@ -1,33 +1,27 @@
-// CategoryFilter.jsx
-import React from 'react';
+// src/app/explore/CategoryFilter.tsx
 
-const CategoryFilter = ({ selectedCategories, onChange }) => {
-  const categories = ['MUSIC', 'PODCAST', 'NEWS', 'CONVERSATION','EDUCATION','OTHER'];
+const CategoryFilter = ({ selectedCategories, onChange }: { selectedCategories: string[]; onChange: (categories: string[]) => void }) => {
+  const categories = ['MUSIC', 'PODCAST', 'CONVERSATION', 'NEWS', 'EDUCATION', 'OTHER'];
 
-  const handleCheckboxChange = (category) => {
-    const newSelectedCategories = selectedCategories.includes(category)
-      ? selectedCategories.filter((item) => item !== category) // Remove if already selected
-      : [...selectedCategories, category]; // Add if not selected
-    onChange(newSelectedCategories);
+  const handleSelect = (category: string) => {
+    const updatedCategories = selectedCategories.includes(category)
+      ? selectedCategories.filter(c => c !== category)
+      : [...selectedCategories, category];
+    onChange(updatedCategories);
   };
 
   return (
-    <div className="mb-6">
-      <h3 className="text-lg font-semibold mb-2">Categories</h3>
-      {categories.map((category) => (
-        <div key={category} className="flex items-center mb-2">
+    <div>
+      <h3 className="font-semibold">Filter by Category</h3>
+      {categories.map(category => (
+        <label key={category} className="block">
           <input
             type="checkbox"
-            id={category}
-            value={category}
             checked={selectedCategories.includes(category)}
-            onChange={() => handleCheckboxChange(category)}
-            className="mr-2"
+            onChange={() => handleSelect(category)}
           />
-          <label htmlFor={category} className="text-white">
-            {category}
-          </label>
-        </div>
+          {category}
+        </label>
       ))}
     </div>
   );

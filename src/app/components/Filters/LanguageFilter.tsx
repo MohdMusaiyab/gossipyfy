@@ -1,33 +1,27 @@
-// LanguageFilter.jsx
-import React from 'react';
+// src/app/explore/LanguageFilter.tsx
 
-const LanguageFilter = ({ selectedLanguages, onChange }) => {
+const LanguageFilter = ({ selectedLanguages, onChange }: { selectedLanguages: string[]; onChange: (languages: string[]) => void }) => {
   const languages = ['ENGLISH', 'HINDI', 'BHOJPURI', 'OTHER'];
 
-  const handleCheckboxChange = (language) => {
-    const newSelectedLanguages = selectedLanguages.includes(language)
-      ? selectedLanguages.filter((item) => item !== language) // Remove if already selected
-      : [...selectedLanguages, language]; // Add if not selected
-    onChange(newSelectedLanguages);
+  const handleSelect = (lang: string) => {
+    const updatedLanguages = selectedLanguages.includes(lang)
+      ? selectedLanguages.filter(l => l !== lang)
+      : [...selectedLanguages, lang];
+    onChange(updatedLanguages);
   };
 
   return (
-    <div className="mb-6">
-      <h3 className="text-lg font-semibold mb-2">Languages</h3>
-      {languages.map((language) => (
-        <div key={language} className="flex items-center mb-2">
+    <div className="mb-4">
+      <h3 className="font-semibold">Filter by Language</h3>
+      {languages.map(lang => (
+        <label key={lang} className="block">
           <input
             type="checkbox"
-            id={language}
-            value={language}
-            checked={selectedLanguages.includes(language)}
-            onChange={() => handleCheckboxChange(language)}
-            className="mr-2"
+            checked={selectedLanguages.includes(lang)}
+            onChange={() => handleSelect(lang)}
           />
-          <label htmlFor={language} className="text-white">
-            {language}
-          </label>
-        </div>
+          {lang}
+        </label>
       ))}
     </div>
   );

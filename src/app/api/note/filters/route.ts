@@ -1,7 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "../../../../../lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 export async function GET(req: NextRequest) {
+  // Get user session to check the user's premium status
+  console.log("api hit")
+  const session = await getServerSession(authOptions);
+  const isPremium = session?.user?.isPremium || false;
+  
+  // Extract search parameters from the request
   const { searchParams } = new URL(req.url);
   const categories =
     searchParams
@@ -20,35 +28,46 @@ export async function GET(req: NextRequest) {
   const skip = (page - 1) * limit; // Number of results to skip
 
   try {
+    // Create a filter for the query
     const filter: any = {};
 
-    // Prisma uses "in" for array filtering
-    if (categories.length > 0) {
+    // Filter by categories, but only if there are valid values
+    if (categories.length > 0 && categories[0] !== "") {
       filter.category = { in: categories };
     }
-
-    if (languages.length > 0) {
+    
+    // Filter by languages, but only if there are valid values
+    if (languages.length > 0 && languages[0] !== "") {
       filter.language = { in: languages };
     }
 
+    // If user is not premium, show only free notes
+    if (!isPremium) {
+      filter.isPremium = false;
+    }
+
+    // Fetch notes and total count based on the filter
     const notes = await prisma.voiceNote.findMany({
       where: filter,
       skip,
       take: limit,
     });
+
     const totalNotes = await prisma.voiceNote.count({
-      where: filter, // To get the total count for pagination purposes
+      where: filter,
     });
 
-    console.log("Query executed successfully");
-
+    // Check if any notes are found
     if (notes.length === 0) {
       return NextResponse.json({
         status: 404,
-        body: "No notes found",
+        success: false,
+        message: "No notes found",
       });
     }
 
+    // Return the response with notes and pagination data
+    console.log("notes", notes)
     return NextResponse.json({
       status: 200,
       success: true,
@@ -63,7 +82,8 @@ export async function GET(req: NextRequest) {
     console.error("Error fetching notes:", error);
     return NextResponse.json({
       status: 500,
-      body: "An error occurred while fetching notes",
+      success: false,
+      message: "An error occurred while fetching notes",
     });
   }
 }
