@@ -2,9 +2,11 @@ import { getUser } from "@/actions/user/getUser";
 import UpdateUsernameForm from "../../components/profile/UpdateUsernameForm";
 import UpdateUserEmailForm from "../../components/profile/UpdateUserEmailForm";
 import UpdateUserPasswordForm from "../../components/profile/UpdateUserPasswordForm";
+import YourNotes from "../../components/profile/YourNotes";
+import SingleVoiceNote from "../../components/SingleVoiceNote";
 const ProfilePage = async () => {
   const user = await getUser(); // Fetch the user data
-
+  
   if (!user) {
     return <div>No user data found</div>; // Handle case where user is not found
   }
@@ -25,7 +27,8 @@ const ProfilePage = async () => {
       <UpdateUsernameForm currentUsername={user.username} />
       <UpdateUserEmailForm currentEmail={user.email} />
       <UpdateUserPasswordForm />
-    </div>
+      <YourNotes />
+      </div>
   );
 };
 

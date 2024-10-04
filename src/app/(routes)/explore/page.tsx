@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import SideBar from "../../components/SideBar";
+import Link from "next/link";
 
 const ExplorePage = () => {
   const [languageFilters, setLanguageFilters] = useState<string[]>([]);
@@ -104,10 +105,10 @@ const ExplorePage = () => {
         {error && <p className="text-red-500">{error}</p>}
         <div className="notes-list">
           {notes.map((note) => (
-            <div key={note.id} className="note-card">
+            <Link href={`explore/${note.id}`} key={note.id} className="note-card">
               <h2 className="text-lg font-semibold">{note.title}</h2>
               <p>{note.description}</p>
-            </div>
+            </Link>
           ))}
         </div>
 
