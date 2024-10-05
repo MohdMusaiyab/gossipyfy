@@ -52,7 +52,6 @@ model VoiceNote {
   createdAt   DateTime @default(now())
   userId      String
   user        User      @relation(fields: [userId], references: [id])
-
   // Relations
   comments    Comment[] // One-to-many relation with comments
   likes       Like[]    // One-to-many relation with likes

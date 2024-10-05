@@ -15,6 +15,7 @@ const SingleVoiceNote = ({ noteId}) => {
         try {
           const fetchedNote = await singleNote(noteId); // Call the server action
           setNote(fetchedNote); // Set the fetched note in state
+          console.log(fetchedNote);
           setLoading(false); // Turn off the loading state
         } catch (err) {
           setError(err.message); // Set error message
@@ -51,7 +52,10 @@ const SingleVoiceNote = ({ noteId}) => {
         <p>Language: {note.language}</p>
         <p>Premium Content: {note.isPremium ? 'Yes' : 'No'}</p>
         <p>Category: {note.category}</p>
+        <p>Likes: {note.likes.length}</p>
+        <p>Comments {note.comments.length}</p>
         <p>Created At: {new Date(note.createdAt).toLocaleDateString()}</p>
+        
       </div>
     );
   };

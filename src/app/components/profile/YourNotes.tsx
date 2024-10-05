@@ -38,7 +38,7 @@ const YourNotes = () => {
         ) : (
           <ul className="space-y-4">
             {notes.map((note) => (
-              <Link href={`note/${note.id}`} key={note.id} className="p-4 border rounded-lg">
+              <Link href={`profile/my-note/${note.id}`} key={note.id} className="p-4 border rounded-lg">
                 <h3 className="text-lg font-bold">{note.title}</h3>
                 <p>{note.description || 'No description available'}</p>
                 <p>

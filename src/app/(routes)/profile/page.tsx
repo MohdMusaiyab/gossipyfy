@@ -3,7 +3,7 @@ import UpdateUsernameForm from "../../components/profile/UpdateUsernameForm";
 import UpdateUserEmailForm from "../../components/profile/UpdateUserEmailForm";
 import UpdateUserPasswordForm from "../../components/profile/UpdateUserPasswordForm";
 import YourNotes from "../../components/profile/YourNotes";
-import SingleVoiceNote from "../../components/SingleVoiceNote";
+import SingleVoiceNote from "../../components/Notes/SingleVoiceNote";
 const ProfilePage = async () => {
   const user = await getUser(); // Fetch the user data
   

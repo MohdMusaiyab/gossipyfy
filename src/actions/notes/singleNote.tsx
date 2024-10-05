@@ -12,6 +12,23 @@ export const singleNote = async (id: string) => {
       where: {
         id: id,
       },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        fileUrl: true,
+        likes: true,
+        comments: true,
+        isPremium: true,
+        language: true,
+        category: true,
+        createdAt: true,
+        user: {
+          select: {
+            username: true,
+          },
+        },
+      },
     });
     if (!note) {
       throw new Error("Note not found");

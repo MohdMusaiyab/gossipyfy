@@ -3,7 +3,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import LoginBtn from './auth/LoginButton';
+import LoginBtn from '../auth/LoginButton';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false); // State to track menu visibility
