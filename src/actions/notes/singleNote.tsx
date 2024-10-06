@@ -17,8 +17,24 @@ export const singleNote = async (id: string) => {
         title: true,
         description: true,
         fileUrl: true,
-        likes: true,
-        comments: true,
+        likes: {
+          select: {
+            userId: true,
+          },
+        },
+        //Also return the username from the user table in the response form comments
+        comments: {
+          select: {
+            id: true,
+            text: true,
+            createdAt: true,
+            user: {
+              select: {
+                username: true,
+              },
+            },
+          },
+        },
         isPremium: true,
         language: true,
         category: true,

@@ -1,63 +1,142 @@
-"use client"
-import React, { useEffect, useState } from 'react';
-import { singleNote } from '@/actions/notes/singleNote'; 
+"use client";
+import React, { useEffect, useState } from "react";
+import { singleNote } from "@/actions/notes/singleNote";
+import { addComment } from "@/actions/notes/addComment";
+import { toggleLike } from "@/actions/notes/toggleLike"; 
+import { useSession } from "next-auth/react";
+import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 
+const SingleVoiceNote = ({ noteId }) => {
+  const { data: session } = useSession();
+  const [note, setNote] = useState(null);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [newComment, setNewComment] = useState("");
+  const [comments, setComments] = useState([]);
+  const [likeCount, setLikeCount] = useState(0);
+  const [hasLiked, setHasLiked] = useState(false);
 
-// Component that takes a noteId and fetches the corresponding voice note
-const SingleVoiceNote = ({ noteId}) => {
-    const [note, setNote] = useState(null); // State to store note data
-    const [error, setError] = useState(null); // State to store error message
-    const [loading, setLoading] = useState(true); // State to handle loading
-  
-    // Fetch the note when the component mounts
-    useEffect(() => {
-      const fetchNote = async () => {
-        try {
-          const fetchedNote = await singleNote(noteId); // Call the server action
-          setNote(fetchedNote); // Set the fetched note in state
-          console.log(fetchedNote);
-          setLoading(false); // Turn off the loading state
-        } catch (err) {
-          setError(err.message); // Set error message
-          setLoading(false); // Turn off the loading state
-        }
-      };
-  
-      fetchNote(); // Invoke the function to fetch the note
-    }, [noteId]);
-  
-    // Loading state
-    if (loading) {
-      return <div>Loading...</div>;
+  useEffect(() => {
+    const fetchNote = async () => {
+      try {
+        const fetchedNote = await singleNote(noteId);
+        setNote(fetchedNote);
+        setComments(fetchedNote.comments);
+        setLikeCount(fetchedNote.likes.length || 0); // Ensure like count defaults to 0
+        setHasLiked(fetchedNote.likes.some(like => like.userId === session?.user?.id));
+        setLoading(false);
+      } catch (err) {
+        setError(err.message);
+        setLoading(false);
+      }
+    };
+
+    fetchNote();
+  }, [noteId, session?.user?.id]);
+
+  const handleToggleLike = async () => {
+    try {
+      if (!session) {
+        setError("Please login to like this note");
+        return;
+      }
+
+      // Optimistically update like count and status
+      setHasLiked((prev) => !prev);
+      setLikeCount((prev) => hasLiked ? prev - 1 : prev + 1);
+
+      const updatedNote = await toggleLike(noteId); // Call the toggleLike function
+      // Optionally, you can also validate the updatedNote response if necessary.
+      // const updatedLikes = updatedNote.likes || []; 
+      // setLikeCount(updatedLikes.length); // Update like count safely
+    } catch (err) {
+      console.error("Error toggling like", err);
+      setError(err.message);
+      // Rollback the optimistic update if there was an error
+      setHasLiked((prev) => !prev);
+      setLikeCount((prev) => hasLiked ? prev + 1 : prev - 1);
     }
-  
-    // Error handling
-    if (error) {
-      return <div>{error}</div>;
-    }
-  
-    // If no note is found
-    if (!note) {
-      return <div>Note not found</div>;
-    }
-  
-    // Render the note details
-    return (
-      <div className="voice-note-container">
-        <h2 className="text-2xl font-bold">{note.title}</h2>
-        <p>{note.description}</p>
-        <audio controls src={note.fileUrl}>
-          Your browser does not support the audio element.
-        </audio>
-        <p>Language: {note.language}</p>
-        <p>Premium Content: {note.isPremium ? 'Yes' : 'No'}</p>
-        <p>Category: {note.category}</p>
-        <p>Likes: {note.likes.length}</p>
-        <p>Comments {note.comments.length}</p>
-        <p>Created At: {new Date(note.createdAt).toLocaleDateString()}</p>
-        
-      </div>
-    );
   };
-  
-export default SingleVoiceNote
+
+  const handleCommentSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const userId = session.user.id;
+      const addedComment = await addComment(noteId, newComment, userId);
+      setComments([...comments, addedComment]);
+      setNewComment("");
+    } catch (err) {
+      console.error("Error adding comment", err);
+    }
+  };
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>{error}</div>;
+  if (!note) return <div>Note not found</div>;
+
+  return (
+    <div className="voice-note-container">
+      <h2 className="text-2xl font-bold">{note.title}</h2>
+      <p>{note.description}</p>
+      <audio controls src={note.fileUrl}>
+        Your browser does not support the audio element.
+      </audio>
+      <p>Language: {note.language}</p>
+      <p>Premium Content: {note.isPremium ? "Yes" : "No"}</p>
+      <p>Category: {note.category}</p>
+      
+      {/* Like section with icon */}
+      <div className="flex items-center gap-2 my-2">
+        <button 
+          onClick={handleToggleLike}
+          className={`flex items-center gap-1 ${hasLiked ? 'text-red-500' : 'text-gray-500 hover:text-red-500'} transition-colors`}
+        >
+          {hasLiked ? (
+            <AiFillHeart size={24} />
+          ) : (
+            <AiOutlineHeart size={24} />
+          )}
+          <span>{likeCount}</span>
+        </button>
+      </div>
+
+      <p>Comments: {comments.length}</p>
+      <p>Created At: {new Date(note.createdAt).toLocaleDateString()}</p>
+
+      <div className="comments-section mt-5">
+        <h3 className="text-lg font-semibold">Comments</h3>
+        {comments.length > 0 ? (
+          <ul>
+            {comments.map((comment) => (
+              <li key={comment.id} className="border-b py-2">
+                <p>
+                  <strong>{comment.user.username}:</strong> {comment.text}
+                </p>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>No comments yet.</p>
+        )}
+
+        <form onSubmit={handleCommentSubmit} className="mt-4">
+          <textarea
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            placeholder="Add a comment..."
+            required
+            className="border p-2 w-full"
+          />
+          <button
+            type="submit"
+            className="mt-2 p-2 bg-blue-500 text-white rounded"
+          >
+            Submit
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default SingleVoiceNote;
