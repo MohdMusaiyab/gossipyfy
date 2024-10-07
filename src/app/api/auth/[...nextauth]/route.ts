@@ -46,7 +46,7 @@ export const authOptions: NextAuthOptions = {
           if (!isValidPassword) {
             throw new Error("Invalid password.");
           }
-          return user; 
+          return user;
         } catch (error) {
           console.error("Error during authorization:", error);
           return null; // Handle errors during the fetch
@@ -57,12 +57,11 @@ export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
     async session({ session, token }) {
-      
       if (token?.sub) {
         //@ts-ignore
         session.user.id = token.sub; // Assign user id from token to session
         session.user.username = token.username;
-        session.user.isPremium= token.isPremium;
+        session.user.isPremium = token.isPremium;
       }
       return session;
     },
@@ -70,13 +69,46 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id; // Add user id to token if user exists
         token.username = user?.username;
-        token.isPremium= user?.isPremium;
-
+        token.isPremium = user?.isPremium;
       }
       return token;
     },
     //For Google Auth Add in Future
-    
+    async signIn({ user, account, profile }) {
+      if (account.provider === "google") {
+        // Check if the user already exists in the database
+        const existingUser = await prisma.user.findFirst({
+          where: { email: profile.email },
+        });
+
+        if (!existingUser) {
+          // Create a random password for the Google user
+          const randomPassword = Math.random().toString(36).slice(-8);
+          const hashedPassword = await bcrypt.hash(randomPassword, 10);
+
+          // Create a new user in the database
+          const newUser = await prisma.user.create({
+            data: {
+              email: profile.email,
+              username: profile.name || `user_${Math.random().toString(36).slice(2, 8)}`, // Fallback if profile.name is missing
+              isPremium: false,
+              password: hashedPassword,
+            },
+          });
+
+          // Attach the new user's info to the session
+          user.id = newUser.id;
+          user.username = newUser.username;
+          user.isPremium = newUser.isPremium;
+        } else {
+          // Attach the existing user's info to the session
+          user.id = existingUser.id;
+          user.username = existingUser.username;
+          user.isPremium = existingUser.isPremium;
+        }
+      }
+      return true; // Allow sign-in
+    },
   },
   pages: {
     signIn: "/auth/sign-in",

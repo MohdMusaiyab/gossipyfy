@@ -1,19 +1,29 @@
-"use client"
+"use client";
 import React, { useState } from "react";
 import axios from "axios";
 import { X, Upload, Loader2 } from "lucide-react";
+import { Category } from "@/types/Categories";
+import { Language } from "@/types/Languages";
 
 const UploadModal = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-  const [formData, setFormData] = useState({
+  
+  // Define the type of formData to ensure enums are used
+  const [formData, setFormData] = useState<{
+    title: string;
+    description: string;
+    language: Language;
+    category: Category;
+  }>({
     title: "",
     description: "",
-    language: "",
-    category: "" 
+    language: Language.ENGLISH,
+    category: Category.MUSIC
   });
+
   const [file, setFile] = useState<File | null>(null);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -22,11 +32,11 @@ const UploadModal = () => {
     setError(null);
     
     const data = new FormData();
-    
-    Object.keys(formData).forEach(key => {
-      data.append(key, formData[key as keyof typeof formData]);
-    });
-    
+    data.append("title", formData.title);
+    data.append("description", formData.description);
+    data.append("language", formData.language);
+    data.append("category", formData.category);
+
     if (file) {
       data.append("file", file);
     }
@@ -43,8 +53,8 @@ const UploadModal = () => {
         setFormData({
           title: "",
           description: "",
-          language: "",
-          category: ""
+          language: Language.ENGLISH,
+          category: Category.MUSIC
         });
         setFile(null);
       }, 2000);
@@ -56,8 +66,9 @@ const UploadModal = () => {
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -80,15 +91,11 @@ const UploadModal = () => {
       {isOpen && (
         <div className="fixed inset-0 z-50 overflow-y-auto text-black">
           <div className="flex min-h-full items-center justify-center p-4">
-            {/* Backdrop */}
             <div
               className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
               onClick={() => setIsOpen(false)}
             />
-
-            {/* Modal */}
             <div className="relative bg-white rounded-lg w-full max-w-md p-6 shadow-xl">
-              {/* Header */}
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-semibold text-gray-900">Upload Note</h2>
                 <button
@@ -141,34 +148,44 @@ const UploadModal = () => {
                     />
                   </div>
 
+                  {/* Language Select */}
                   <div className="space-y-2">
                     <label htmlFor="language" className="block text-sm font-medium text-gray-700">
                       Language
                     </label>
-                    <input
+                    <select
                       id="language"
-                      type="text"
                       name="language"
-                      required
-                      placeholder="Enter language"
+                      value={formData.language}
                       onChange={handleChange}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
+                    >
+                      {Object.values(Language).map(lang => (
+                        <option key={lang} value={lang}>
+                          {lang}
+                        </option>
+                      ))}
+                    </select>
                   </div>
 
+                  {/* Category Select */}
                   <div className="space-y-2">
                     <label htmlFor="category" className="block text-sm font-medium text-gray-700">
                       Category
                     </label>
-                    <input
+                    <select
                       id="category"
-                      type="text"
                       name="category"
-                      required
-                      placeholder="Enter category"
+                      value={formData.category}
                       onChange={handleChange}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
+                    >
+                      {Object.values(Category).map(cat => (
+                        <option key={cat} value={cat}>
+                          {cat}
+                        </option>
+                      ))}
+                    </select>
                   </div>
 
                   <div className="space-y-2">
@@ -180,7 +197,7 @@ const UploadModal = () => {
                       type="file"
                       onChange={handleFile}
                       required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
 

@@ -2,6 +2,7 @@
 
 import LanguageFilter from './Filters/LanguageFilter';
 import CategoryFilter from './Filters/CategoryFilter';
+import UploadModal from './UploadModal';
 
 const Sidebar = ({
   selectedLanguages,
@@ -20,6 +21,7 @@ const Sidebar = ({
       
       <LanguageFilter selectedLanguages={selectedLanguages} onChange={onLanguageChange} />
       <CategoryFilter selectedCategories={selectedCategories} onChange={onCategoryChange} />
+      <UploadModal />
     </aside>
   );
 };
