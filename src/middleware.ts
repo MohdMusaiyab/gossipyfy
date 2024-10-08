@@ -6,7 +6,7 @@ export async function middleware(req:NextRequest) {
     const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
   
     // Define protected routes
-    const protectedRoutes = ['/home', '/dashboard', '/explore','/profile'];
+    const protectedRoutes = ['/dashboard', '/explore','/profile'];
   
     // Check if the user is accessing a protected route
     if (protectedRoutes.some(route => req.nextUrl.pathname.startsWith(route))) {

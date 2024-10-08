@@ -1,14 +1,22 @@
 "use client";
-import React, { useState } from "react";
-import { signIn } from "next-auth/react";
+import React, { useState, useEffect } from "react";
+import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 const SignInPage = () => {
+  const { data: session, status } = useSession();
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    // If the user is already authenticated, redirect to the explore page
+    if (status === "authenticated") {
+      router.push("/");
+    }
+  }, [status, router]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,10 +30,20 @@ const SignInPage = () => {
     if (result?.error) {
       setError("Invalid credentials. Please try again.");
     } else {
-      // Redirect to the home page or any other page after successful sign-in
+      // Redirect to the explore page after successful sign-in
       router.push("/explore");
     }
   };
+
+  if (status === "loading") {
+    // Show loading state while session is being checked
+    return <div>Loading...</div>;
+  }
+
+  if (status === "authenticated") {
+    // If authenticated, show nothing (since we are redirecting in useEffect)
+    return null;
+  }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
@@ -86,7 +104,7 @@ const SignInPage = () => {
           Sign in with Google
         </button>
         <p className="text-blue-600">
-          Don't Have an Account?<Link href="/auth/sign-up">Sign Up</Link>
+          Don't Have an Account? <Link href="/auth/sign-up">Sign Up</Link>
         </p>
       </div>
     </div>

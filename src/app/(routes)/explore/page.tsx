@@ -2,10 +2,12 @@
 import { useEffect, useState } from "react";
 import SideBar from "../../components/SideBar";
 import Link from "next/link";
+import SearchBar from "@/app/components/Filters/SearchBar"; // Import SearchBar component
 
 const ExplorePage = () => {
   const [languageFilters, setLanguageFilters] = useState<string[]>([]);
   const [categoryFilters, setCategoryFilters] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState<string>(""); // New state for search query
   const [notes, setNotes] = useState<VoiceNote[]>([]);
   const [page, setPage] = useState<number>(1);
   const [limit] = useState<number>(10); // Fixed limit for simplicity
@@ -26,6 +28,13 @@ const ExplorePage = () => {
     setNotes([]); // Reset the notes when filters change
   };
 
+  // New function to handle search query change
+  const handleSearch = (query: string) => {
+    setSearchQuery(query); // Set the new search query
+    setPage(1); // Reset to first page on search change
+    setNotes([]); // Reset the notes when search changes
+  };
+
   // Fetch notes from the API
   const fetchNotes = async (page: number) => {
     setLoading(true);
@@ -34,6 +43,7 @@ const ExplorePage = () => {
       const queryParams = new URLSearchParams({
         languages: languageFilters.join(","),
         categories: categoryFilters.join(","),
+        search: searchQuery, // Add search query to request
         page: String(page),
         limit: String(limit),
       });
@@ -47,7 +57,14 @@ const ExplorePage = () => {
       const data = await response.json();
 
       if (Array.isArray(data.notes)) {
-        setNotes((prevNotes) => [...prevNotes, ...data.notes]);
+        setNotes((prevNotes) => {
+          // Filter out notes that already exist in the current list
+          const newNotes = data.notes.filter(
+            (newNote) =>
+              !prevNotes.some((prevNote) => prevNote.id === newNote.id)
+          );
+          return [...prevNotes, ...newNotes];
+        });
       } else {
         console.error("Expected notes to be an array:", data.notes);
       }
@@ -76,10 +93,10 @@ const ExplorePage = () => {
     }
   };
 
-  // Effect to fetch notes when filters, page, or scroll changes
+  // Effect to fetch notes when filters, page, search query, or scroll changes
   useEffect(() => {
     fetchNotes(page);
-  }, [languageFilters, categoryFilters, page]);
+  }, [languageFilters, categoryFilters, searchQuery, page]);
 
   // Attach scroll event listener to the window
   useEffect(() => {
@@ -101,11 +118,18 @@ const ExplorePage = () => {
       <div className="flex-grow p-4">
         <h1 className="text-2xl font-bold mb-4">Explore Voice Notes</h1>
 
+        {/* Search Bar Component */}
+        <SearchBar onSearch={handleSearch} /> {/* New SearchBar component */}
+
         {loading && <p>Loading...</p>}
         {error && <p className="text-red-500">{error}</p>}
         <div className="notes-list">
           {notes.map((note) => (
-            <Link href={`explore/${note.id}`} key={note.id} className="note-card">
+            <Link
+              href={`explore/${note.id}`}
+              key={note.id}
+              className="note-card"
+            >
               <h2 className="text-lg font-semibold">{note.title}</h2>
               <p>{note.description}</p>
             </Link>
@@ -113,9 +137,7 @@ const ExplorePage = () => {
         </div>
 
         {/* If no more data to load, show a message */}
-        {!hasMore && (
-          <p className="text-center mt-4">No more notes available.</p>
-        )}
+        {!hasMore && <p className="text-center mt-4">No more notes available.</p>}
       </div>
     </div>
   );

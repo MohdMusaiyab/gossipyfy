@@ -5,7 +5,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 export async function GET(req: NextRequest) {
   // Get user session to check the user's premium status
-  console.log("api hit")
+  console.log("api hit");
   const session = await getServerSession(authOptions);
   const isPremium = session?.user?.isPremium || false;
   
@@ -21,6 +21,9 @@ export async function GET(req: NextRequest) {
       .get("languages")
       ?.split(",")
       .map((lang) => lang.toUpperCase()) || [];
+  
+  // Extract search query parameter
+  const searchQuery = searchParams.get("search")?.trim() || "";
 
   // Pagination parameters
   const page = parseInt(searchParams.get("page") || "1", 10);
@@ -46,6 +49,14 @@ export async function GET(req: NextRequest) {
       filter.isPremium = false;
     }
 
+    // If searchQuery is provided, add it to the filter
+    if (searchQuery) {
+      filter.OR = [
+        { title: { contains: searchQuery, mode: 'insensitive' } }, // Search in titles
+        { description: { contains: searchQuery, mode: 'insensitive' } } // Search in descriptions
+      ];
+    }
+
     // Fetch notes and total count based on the filter
     const notes = await prisma.voiceNote.findMany({
       where: filter,
@@ -67,7 +78,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Return the response with notes and pagination data
-    console.log("notes", notes)
+    console.log("notes", notes);
     return NextResponse.json({
       status: 200,
       success: true,

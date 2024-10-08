@@ -1,14 +1,23 @@
-// src/app/auth/signup/page.tsx
 "use client";
-import {useRouter} from 'next/navigation';
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+
 export default function SignUpPage() {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const { data: session, status } = useSession();
   const router = useRouter();
+
+  useEffect(() => {
+    // Redirect if the user is authenticated
+    if (status === "authenticated") {
+      router.push("/");
+    }
+  }, [status, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,11 +37,9 @@ export default function SignUpPage() {
         }),
       });
       if (response.ok) {
-        setSuccess("Sign up successful! Please log in.");
-        // Redirect to the login page
+        setSuccess("Sign up successful! Redirecting to login...");
         setError("");
         router.push("/auth/sign-in");
-
       } else {
         const data = await response.json();
         setError(data.message || "Signup failed.");
@@ -41,6 +48,16 @@ export default function SignUpPage() {
       setError("An unexpected error occurred.");
     }
   };
+
+  if (status === "loading") {
+    // Show loading while session is being checked
+    return <div>Loading...</div>;
+  }
+
+  if (status === "authenticated") {
+    // If authenticated, show nothing since the user is redirected in the useEffect
+    return null;
+  }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2">
