@@ -1,9 +1,9 @@
 // src/components/Header.tsx
 "use client";
 
-import React, { useState } from 'react';
-import Link from 'next/link';
-import LoginBtn from '../auth/LoginButton';
+import React, { useState } from "react";
+import Link from "next/link";
+import LoginBtn from "../auth/LoginButton";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false); // State to track menu visibility
@@ -22,10 +22,12 @@ const Header = () => {
 
       {/* Navigation Links */}
       <nav className="hidden md:flex space-x-6">
-        <Link href="/" className="hover:text-gray-300">Home</Link>
-        <Link href="/explore" className="hover:text-gray-300">Explore</Link>
-        <Link href="/services" className="hover:text-gray-300">Services</Link>
-        <Link href="/contact" className="hover:text-gray-300">Contact</Link>
+        <Link href="/" className="hover:text-gray-300">
+          Home
+        </Link>
+        <Link href="/explore" className="hover:text-gray-300">
+          Explore
+        </Link>
       </nav>
 
       {/* Login Button */}
@@ -43,7 +45,12 @@ const Header = () => {
             viewBox="0 0 24 24"
             xmlns="http://www.w3.org/2000/svg"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M4 6h16M4 12h16m-7 6h7"
+            />
           </svg>
         </button>
       </div>
@@ -52,10 +59,16 @@ const Header = () => {
       {isMenuOpen && (
         <div className="absolute top-16 left-0 w-full bg-gray-800 text-white md:hidden">
           <nav className="flex flex-col space-y-2 p-4">
-            <Link href="/" className="hover:text-gray-300" onClick={toggleMenu}>Home</Link>
-            <Link href="/explore" className="hover:text-gray-300" onClick={toggleMenu}>Explore</Link>
-            <Link href="/services" className="hover:text-gray-300" onClick={toggleMenu}>Services</Link>
-            <Link href="/contact" className="hover:text-gray-300" onClick={toggleMenu}>Contact</Link>
+            <Link href="/" className="hover:text-gray-300" onClick={toggleMenu}>
+              Home
+            </Link>
+            <Link
+              href="/explore"
+              className="hover:text-gray-300"
+              onClick={toggleMenu}
+            >
+              Explore
+            </Link>
           </nav>
         </div>
       )}

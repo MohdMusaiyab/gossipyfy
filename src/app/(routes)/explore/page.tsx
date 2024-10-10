@@ -105,7 +105,6 @@ const ExplorePage = () => {
       window.removeEventListener("scroll", handleScroll); // Clean up listener on component unmount
     };
   }, [hasMore, loading]);
-
   return (
     <div className="flex">
       <SideBar
@@ -117,10 +116,8 @@ const ExplorePage = () => {
 
       <div className="flex-grow p-4">
         <h1 className="text-2xl font-bold mb-4">Explore Voice Notes</h1>
-
         {/* Search Bar Component */}
         <SearchBar onSearch={handleSearch} /> {/* New SearchBar component */}
-
         {loading && <p>Loading...</p>}
         {error && <p className="text-red-500">{error}</p>}
         <div className="notes-list">
@@ -135,9 +132,10 @@ const ExplorePage = () => {
             </Link>
           ))}
         </div>
-
         {/* If no more data to load, show a message */}
-        {!hasMore && <p className="text-center mt-4">No more notes available.</p>}
+        {!hasMore && (
+          <p className="text-center mt-4">No more notes available.</p>
+        )}
       </div>
     </div>
   );
