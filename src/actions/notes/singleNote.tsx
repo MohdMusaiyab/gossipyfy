@@ -1,6 +1,7 @@
 "use server";
 import { getSessionOrThrow } from "../../../lib/getSession";
 import prisma from "../../../lib/prisma";
+
 export const singleNote = async (id: string) => {
   try {
     const session = await getSessionOrThrow();
@@ -8,10 +9,11 @@ export const singleNote = async (id: string) => {
       throw new Error("Please Login");
     }
 
+    const userId = session.user.id; // The logged-in user
+
+    // Fetch the note with additional user info (followers, following)
     const note = await prisma.voiceNote.findUnique({
-      where: {
-        id: id,
-      },
+      where: { id: id },
       select: {
         id: true,
         title: true,
@@ -22,7 +24,6 @@ export const singleNote = async (id: string) => {
             userId: true,
           },
         },
-        //Also return the username from the user table in the response form comments
         comments: {
           select: {
             id: true,
@@ -42,15 +43,39 @@ export const singleNote = async (id: string) => {
         user: {
           select: {
             username: true,
+            id: true,
+            followers: true, // Include followers array
+            following: true, // Include following array
           },
         },
       },
     });
+
     if (!note) {
       throw new Error("Note not found");
     }
-    return note;
+
+    const noteOwnerId = note.user.id;
+
+    // Check if the current user is following the note owner
+    const isFollowing = await prisma.user.findFirst({
+      where: {
+        id: userId,
+        following: {
+          some: { id: noteOwnerId },
+        },
+      },
+    });
+
+    // Return the note data along with followers/following counts and follow status
+    return {
+      ...note,
+      isFollowing: !!isFollowing, // Convert to boolean
+      followersCount: note.user.followers.length,
+      followingCount: note.user.following.length,
+    };
   } catch (error) {
-    console.log(error);
+    console.error("Error fetching note:", error);
+    throw new Error("Failed to fetch note");
   }
 };

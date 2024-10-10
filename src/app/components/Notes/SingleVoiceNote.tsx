@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { singleNote } from "@/actions/notes/singleNote";
 import { addComment } from "@/actions/notes/addComment";
 import { toggleLike } from "@/actions/notes/toggleLike"; 
+import { toggleFollowers } from "@/actions/notes/toggleFollowers"; // Add this import
 import { useSession } from "next-auth/react";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 
@@ -15,6 +16,7 @@ const SingleVoiceNote = ({ noteId }) => {
   const [comments, setComments] = useState([]);
   const [likeCount, setLikeCount] = useState(0);
   const [hasLiked, setHasLiked] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(false); // State to track following status
 
   useEffect(() => {
     const fetchNote = async () => {
@@ -24,6 +26,7 @@ const SingleVoiceNote = ({ noteId }) => {
         setComments(fetchedNote.comments);
         setLikeCount(fetchedNote.likes.length || 0); // Ensure like count defaults to 0
         setHasLiked(fetchedNote.likes.some(like => like.userId === session?.user?.id));
+        setIsFollowing(fetchedNote.isFollowing); // Set following status from fetched note
         setLoading(false);
       } catch (err) {
         setError(err.message);
@@ -45,16 +48,43 @@ const SingleVoiceNote = ({ noteId }) => {
       setHasLiked((prev) => !prev);
       setLikeCount((prev) => hasLiked ? prev - 1 : prev + 1);
 
-      const updatedNote = await toggleLike(noteId); // Call the toggleLike function
-      // Optionally, you can also validate the updatedNote response if necessary.
-      // const updatedLikes = updatedNote.likes || []; 
-      // setLikeCount(updatedLikes.length); // Update like count safely
+      await toggleLike(noteId); // Call the toggleLike function
     } catch (err) {
       console.error("Error toggling like", err);
       setError(err.message);
       // Rollback the optimistic update if there was an error
       setHasLiked((prev) => !prev);
       setLikeCount((prev) => hasLiked ? prev + 1 : prev - 1);
+    }
+  };
+
+  const handleToggleFollow = async () => {
+    try {
+      if (!session) {
+        setError("Please login to follow this user");
+        return;
+      }
+
+      // Optimistically update following status
+      setIsFollowing((prev) => !prev);
+      const updatedFollowersCount = isFollowing ? note.user.followers.length - 1 : note.user.followers.length + 1;
+      
+      // Optimistically update note's follower count
+      setNote((prev) => ({
+        ...prev,
+        user: {
+          ...prev.user,
+          followers: isFollowing ? prev.user.followers.slice(0, -1) : [...prev.user.followers, session.user.id],
+          following: prev.user.following // Assuming you don't need to update following count here
+        }
+      }));
+
+      await toggleFollowers(note.user.id); // Call the toggleFollowers function
+    } catch (err) {
+      console.error("Error toggling follow status", err);
+      setError(err.message);
+      // Rollback the optimistic update if there was an error
+      setIsFollowing((prev) => !prev);
     }
   };
 
@@ -98,6 +128,18 @@ const SingleVoiceNote = ({ noteId }) => {
           )}
           <span>{likeCount}</span>
         </button>
+      </div>
+
+      {/* Follow section */}
+      <div className="flex items-center gap-2 my-2">
+        <button 
+          onClick={handleToggleFollow}
+          className={`p-2 rounded ${isFollowing ? 'bg-red-500 text-white' : 'bg-blue-500 text-white'}`}
+        >
+          {isFollowing ? "Unfollow" : "Follow"} {note.user.username}
+        </button>
+        <p>{note.user.followers.length} Followers</p>
+        <p>{note.user.following.length} Following</p>
       </div>
 
       <p>Comments: {comments.length}</p>

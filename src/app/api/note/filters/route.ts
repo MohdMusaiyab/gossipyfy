@@ -62,6 +62,18 @@ export async function GET(req: NextRequest) {
       where: filter,
       skip,
       take: limit,
+      orderBy: {
+        createdAt: "desc",
+      },
+      // Include the user object in the response and its id and username
+      include: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+          },
+        },
+      },
     });
 
     const totalNotes = await prisma.voiceNote.count({

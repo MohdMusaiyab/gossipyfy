@@ -105,6 +105,7 @@ const ExplorePage = () => {
       window.removeEventListener("scroll", handleScroll); // Clean up listener on component unmount
     };
   }, [hasMore, loading]);
+  console.log(notes);
   return (
     <div className="flex">
       <SideBar
@@ -128,6 +129,7 @@ const ExplorePage = () => {
               className="note-card"
             >
               <h2 className="text-lg font-semibold">{note.title}</h2>
+              <span>{note?.user?.username}</span>
               <p>{note.description}</p>
             </Link>
           ))}

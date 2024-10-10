@@ -39,6 +39,10 @@ model User {
   voiceNotes VoiceNote[]  // A user can have multiple voice notes
   comments   Comment[]   // A user can have multiple comments
   likes     Like[]      // A user can have multiple likes
+  
+  // Relations for following and followers
+  following  User[] @relation("UserToFollow")
+  followers  User[] @relation("UserToFollow")
 }
 
 model VoiceNote {
