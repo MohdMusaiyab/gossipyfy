@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
-import { myFollowingNotes } from '@/actions/notes/myFollowingnotes';
-
+import React, { useEffect, useState } from "react";
+import { myFollowingNotes } from "@/actions/notes/myFollowingnotes";
+import Link from "next/link";
 const NotesPage = () => {
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -11,13 +11,13 @@ const NotesPage = () => {
   useEffect(() => {
     const fetchNotes = async () => {
       try {
-        const userId = 'your-user-id-here'; // Pass the current userId (can come from session)
+        const userId = "your-user-id-here"; // Pass the current userId (can come from session)
         const fetchedNotes = await myFollowingNotes(userId);
         setNotes(fetchedNotes);
         setLoading(false);
       } catch (error) {
-        console.error('Failed to fetch notes:', error);
-        setError('Failed to fetch notes');
+        console.error("Failed to fetch notes:", error);
+        setError("Failed to fetch notes");
         setLoading(false);
       }
     };
@@ -34,12 +34,14 @@ const NotesPage = () => {
       {notes.length > 0 ? (
         <ul>
           {notes.map((note) => (
-            <li key={note.id}>
-              <h2>{note.title}</h2>
-              <p>Created by: {note.user.username}</p>
-              <p>Description: {note.description}</p>
-              <audio controls src={note.fileUrl}></audio>
-            </li>
+            <Link href={`/explore/${note.id}`}>
+              <li key={note.id}>
+                <h2>{note.title}</h2>
+                <p>Created by: {note.user.username}</p>
+                <p>Description: {note.description}</p>
+                <audio controls src={note.fileUrl}></audio>
+              </li>
+            </Link>
           ))}
         </ul>
       ) : (

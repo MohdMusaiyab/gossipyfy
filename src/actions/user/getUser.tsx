@@ -1,28 +1,42 @@
-"use server ";
+"use server";
 import prisma from "../../../lib/prisma";
 import { getSessionOrThrow } from "../../../lib/getSession";
-
-export const getUser = async () => {
+export const getUser = async (userId: string) => {
   try {
-    // Get the session, and handle authentication failure in getSessionOrThrow
+    // Get the profile of the user by their ID and return everything except the password
     const session = await getSessionOrThrow();
     if (!session) {
-      throw new Error("User not authenticated");
+      throw new Error("Log in Before this Step");
     }
-    //Get the profile of the user and return everyting except the password
     const user = await prisma.user.findUnique({
       where: {
-        email: session.user.email,
+        id: userId, // Use the provided userId instead of session
       },
       select: {
         id: true,
         username: true,
         email: true,
         voiceNotes: true,
-        followers: true,
-        following: true,
+        followers: {
+          select: {
+            id: true,
+            username: true,
+          },
+        },
+        following: {
+          select: {
+            id: true,
+            username: true,
+          },
+        },
       },
     });
+
+    // Check if user exists
+    if (!user) {
+      throw new Error("User not found");
+    }
+
     return user;
   } catch (error) {
     console.log(error);
