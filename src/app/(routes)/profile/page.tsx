@@ -3,7 +3,7 @@ import UpdateUsernameForm from "../../components/profile/UpdateUsernameForm";
 import UpdateUserEmailForm from "../../components/profile/UpdateUserEmailForm";
 import UpdateUserPasswordForm from "../../components/profile/UpdateUserPasswordForm";
 import YourNotes from "../../components/profile/YourNotes";
-import SingleVoiceNote from "../../components/Notes/SingleVoiceNote";
+import Link from "next/link";
 const ProfilePage = async () => {
   const user = await getUser(); // Fetch the user data
   
@@ -21,6 +21,10 @@ const ProfilePage = async () => {
       </p>
       <p>
         <strong>Email:</strong> {user.email}
+      </p>
+      <p>
+        <Link href="/profile/my-followers">Followers {user.followers.length}</Link>
+        <Link href="/profile/my-followings">Following {user.following.length}</Link>
       </p>
 
       {/* Render the UpdateUsernameForm and pass the current username */}

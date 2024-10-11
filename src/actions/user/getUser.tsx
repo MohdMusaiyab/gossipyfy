@@ -19,6 +19,8 @@ export const getUser = async () => {
         username: true,
         email: true,
         voiceNotes: true,
+        followers: true,
+        following: true,
       },
     });
     return user;

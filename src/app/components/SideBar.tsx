@@ -3,6 +3,7 @@
 import LanguageFilter from './Filters/LanguageFilter';
 import CategoryFilter from './Filters/CategoryFilter';
 import UploadModal from './UploadModal';
+import Link from 'next/link';
 
 const Sidebar = ({
   selectedLanguages,
@@ -22,6 +23,8 @@ const Sidebar = ({
       <LanguageFilter selectedLanguages={selectedLanguages} onChange={onLanguageChange} />
       <CategoryFilter selectedCategories={selectedCategories} onChange={onCategoryChange} />
       <UploadModal />
+      <Link href="/explore/my-followings">My Followings</Link>
+      
     </aside>
   );
 };
